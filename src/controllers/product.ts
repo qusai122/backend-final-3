@@ -1,7 +1,32 @@
+import { Brand } from '@/models/Brand';
 import { Product } from '@/models/Product';
 import { RequestHandler, Request, Response } from 'express';
 import { ParsedQs } from 'qs';
 const { Op } = require('sequelize');
+
+export const search: RequestHandler = async (req, res) => {
+  const { keyword } = req.query;
+
+  const products = await Product.findAll({
+    include: [
+      {
+        model: Brand,
+      },
+    ],
+    where: {
+      [Op.or]: [
+        { name: { [Op.like]: `%${keyword}%` } },
+        { '$brand.name$': { [Op.like]: `%${keyword}%` } },
+      ],
+    },
+  });
+
+  try {
+    return res.status(200).json(products);
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+};
 
 export const getLimitedEdition: RequestHandler = async (req, res) => {
   req.query.quantity = '20';
@@ -13,6 +38,7 @@ export const getLimitedEdition: RequestHandler = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+
 export const Popular: RequestHandler = async (req, res) => {
   req.query.rating = '4.5';
   const filter = createFilter(req.query);
@@ -23,6 +49,7 @@ export const Popular: RequestHandler = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+
 export const newArrivals: RequestHandler = async (req, res) => {
   req.query.isNew = '1';
   const filter = createFilter(req.query);
@@ -44,6 +71,7 @@ export const Handpicked: RequestHandler = async (req, res) => {
     return res.status(500).json(error);
   }
 };
+
 export const getProducts: RequestHandler = async (req, res) => {
   const filter = createFilter(req.query);
 
@@ -69,8 +97,8 @@ function createFilter(query: ParsedQs) {
   const { handpicked } = query;
   const { minPrice } = query;
   const { maxPrice } = query;
-
   let filter = {};
+
   if (limited == '1') {
     filter['quantity'] = {
       [Op.lt]: 20,
@@ -115,5 +143,6 @@ function createFilter(query: ParsedQs) {
       [Op.lte]: maxPrice,
     };
   }
+  console.log(filter);
   return filter;
 }
