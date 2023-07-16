@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production node ./dist/src/bin/index.js",
+    "start": "cross-env NODE_ENV=development nodemon",
     "dev": "cross-env NODE_ENV=development nodemon"
   },
   "keywords": [],
