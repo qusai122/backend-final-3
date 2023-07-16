@@ -13,15 +13,26 @@ export async function getProductsByFilter(filter) {
 }
 
 export function createProductFilter(query: ParsedQs) {
-  const { quantity, discount, rating, isNew, handpicked, minPrice, maxPrice } =
-    query;
+  const {
+    quantity,
+    discount,
+    rating,
+    isNew,
+    handpicked,
+    minPrice,
+    maxPrice,
+    brand_id,
+    category_id,
+  } = query;
 
   const filter = {};
+
   if (quantity) {
     filter['quantity'] = {
       [Op.lt]: quantity,
     };
   }
+
   if (discount) {
     filter['discount'] = {
       [Op.gte]: discount,
@@ -59,6 +70,7 @@ export function createProductFilter(query: ParsedQs) {
       [Op.lte]: maxPrice,
     };
   }
+  console.log(filter);
   return filter;
 }
 
